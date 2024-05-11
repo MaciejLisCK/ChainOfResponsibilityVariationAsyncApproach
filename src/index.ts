@@ -1,6 +1,6 @@
 import { ProcessManager } from "./ProcessManager";
 
 const processManager = new ProcessManager()
-processManager.start()
+processManager.finished$.subscribe(() => console.log("All surveys are finished."))
 
-processManager.finished$.subscribe(() => console.log('finished'))
+processManager.start()

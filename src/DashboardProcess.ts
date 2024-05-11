@@ -1,4 +1,4 @@
-import { BehaviorSubject, filter, map } from "rxjs";
+import { BehaviorSubject, filter, map, tap } from "rxjs";
 import { ProcesState } from "./ProcesState";
 
 
@@ -20,8 +20,10 @@ export abstract class DashboardProcess {
     constructor() {
         this.shouldRunOrSkipState$.subscribe({ next: () => this.shouldRunOrSkip() });
         this.runningState$.subscribe({ next: () => this.running() });
-        this.skippedState$.subscribe({next: () => this.skipped() })
+        this.skippedState$.subscribe({ next: () => this.skipped() })
         this.doneState$.subscribe({ next: () => this.done() });
+
+        this.doneOrSkippedState$.subscribe({ next: () => this.state$.complete() });
     }
 
     start(): void {

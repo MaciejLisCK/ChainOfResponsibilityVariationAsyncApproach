@@ -1,4 +1,4 @@
-import { combineLatest, filter, map, startWith } from "rxjs";
+import { forkJoin } from "rxjs";
 import Survey1 from "./Survey1";
 import Survey2 from "./Survey2";
 import Survey3 from "./Survey3";
@@ -10,32 +10,24 @@ export class ProcessManager {
     survey3 = new Survey3()
     survey4 = new Survey4()
     
-    isFinished$ = this.getIsFinished$()
     finished$ = this.getFinished$();
     
     constructor() {
-        this.survey1.doneOrSkippedState$.subscribe(() => this.survey2.start());
-        this.survey2.doneOrSkippedState$.subscribe(() => this.survey3.start());
-        this.survey3.doneOrSkippedState$.subscribe(() => this.survey4.start());
+        this.survey1.state$.subscribe({ complete: () => this.survey2.start() });
+        this.survey2.state$.subscribe({ complete: () => this.survey3.start() });
+        this.survey3.state$.subscribe({ complete: () => this.survey4.start() });
     }
     
     start() {
         this.survey1.start();
     }
-
-    getIsFinished$() {
-        return combineLatest([
-            this.survey1.isDoneOrSkippedState$,
-            this.survey2.isDoneOrSkippedState$,
-            this.survey3.isDoneOrSkippedState$,
-            this.survey4.isDoneOrSkippedState$,
-        ]).pipe(
-            map(([a,b,c,d]) => a && b && c && d),
-            startWith(false)
-        );    
-    }
-
-    getFinished$() {
-        return this.isFinished$.pipe(filter(v => v))
+    
+    private getFinished$() {
+        return forkJoin([
+            this.survey1.state$,
+            this.survey2.state$,
+            this.survey3.state$,
+            this.survey4.state$,
+        ]);    
     }
 } 
