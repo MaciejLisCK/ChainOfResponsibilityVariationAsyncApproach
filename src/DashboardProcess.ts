@@ -1,4 +1,4 @@
-import { BehaviorSubject, distinctUntilChanged, filter, map, tap } from "rxjs";
+import { BehaviorSubject, distinctUntilChanged, filter, map, mapTo, tap } from "rxjs";
 import { ProcesState } from "./ProcesState";
 
 
@@ -11,11 +11,11 @@ export abstract class DashboardProcess {
     isSkippedState$ = this.state$.pipe(map(s => s === ProcesState.Skipped), distinctUntilChanged());
     isDoneOrSkippedState$ = this.state$.pipe(map(s => s === ProcesState.Done || s === ProcesState.Skipped), distinctUntilChanged());
 
-    shouldRunOrSkipState$ = this.isShouldRunOrSkipState$.pipe(filter(Boolean));
-    runningState$ = this.isRunningState$.pipe(filter(Boolean));
-    doneState$ = this.isDoneState$.pipe(filter(Boolean));
-    skippedState$ = this.isSkippedState$.pipe(filter(Boolean));
-    doneOrSkippedState$ = this.isDoneOrSkippedState$.pipe(filter(Boolean));
+    shouldRunOrSkipState$ = this.isShouldRunOrSkipState$.pipe(filter(Boolean), map<boolean, void>(() => { }));
+    runningState$ = this.isRunningState$.pipe(filter(Boolean), map<boolean, void>(() => { }));
+    doneState$ = this.isDoneState$.pipe(filter(Boolean), map<boolean, void>(() => { }));
+    skippedState$ = this.isSkippedState$.pipe(filter(Boolean), map<boolean, void>(() => { }));
+    doneOrSkippedState$ = this.isDoneOrSkippedState$.pipe(filter(Boolean), map<boolean, void>(() => { }));
     
     constructor() {
         this.shouldRunOrSkipState$.subscribe({ next: () => this.shouldRunOrSkip() });
